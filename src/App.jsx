@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { GoogleGenAI } from "@google/genai";
+import './App.css';
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
@@ -30,17 +31,32 @@ const handleSend = async () => {
 }
 
   return(
-    <div>
-      <h1>💩 Poo for the Planet</h1>
-      <div>
-        {messages.map((msg, i) => (
-          <p key={i}>{msg.role}: {msg.text}</p>
-        ))}
-      </div>
-      <input value={message} onChange={(e) => setMessage(e.target.value)}
-      placeholder="Ask something about dogs and the planet..." />
-      <button onClick={handleSend}>Send</button>
+  <div className="app">
+    <div className="header">
+      <h1>Green<br/>Paws 🐾</h1>
+      <p>eco assistant · earth day · powered by gemini</p>
     </div>
+    <div className="gif-row">
+      <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDRtcDVtbWN1NWxhbWQ3ZGZtdzZ6OWF1OHZtcGF6dWJ6dDR6eTBxZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MDJ9IbxxvDUQM/giphy.gif" alt="dog" />
+      <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjBtNTBvZGU1NXpmdWU3ZzZiczFleHcwejZuNHY2ZHdvbHdibzlodyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0Exk8EUzSLsrErEQ/giphy.gif" alt="earth" />
+    </div>
+    <div className="chat-area">
+      {messages.map((msg, i) => (
+        <div key={i} className={msg.role === 'user' ? 'bubble-user' : 'bubble-bot'}>
+          {msg.text}
+        </div>
+      ))}
+    </div>
+    <div className="input-area">
+      <input
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+        placeholder="ask about eco dog care..."
+      />
+      <button onClick={handleSend}>Send ➤</button>
+    </div>
+  </div>
   )
 }
 
