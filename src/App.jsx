@@ -7,7 +7,7 @@ const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 function App() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-
+  const [loading, setIsLoading] = useState('false');
   const askGemini = async (userMessage) => {
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
@@ -23,11 +23,28 @@ function App() {
 
   const handleSend = async (text) => {
     const msg = text || message;
-    if (!msg.trim()) return;
+
+    if (!msg.trim() || loading) return;
+
+    setIsLoading(true);
     setMessage("");
     setMessages((prev) => [...prev, { role: "user", text: msg }]);
-    const reply = await askGemini(msg);
-    setMessages((prev) => [...prev, { role: "gemini", text: reply }]);
+
+    try {
+      const reply = await askGemini(msg);
+      setMessages((prev) => [...prev, { role: "gemini", text: reply }]);
+    } catch (error) {
+      console.error("Gemini Error:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "gemini",
+          text: "🌿 oops! i hit my rate limit. please try again in a few minutes 🐾",
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -74,6 +91,8 @@ function App() {
             ))}
           </div>
           <div className="dotted-divider" />
+
+          {!loading && (
           <div className="example-questions">
             <p className="example-label">try asking:</p>
             <div className="chips">
@@ -89,6 +108,8 @@ function App() {
               ))}
             </div>
           </div>
+          )}
+          
           <div className="input-area">
             <input
               value={message}
@@ -96,7 +117,7 @@ function App() {
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="ask about eco dog care..."
             />
-            <button onClick={() => handleSend()}>SEND ✦</button>
+            <button onClick={() => handleSend()} disabled={!!loading}>{ loading ? 'Thinking...' : 'SEND ✦'}</button>
           </div>
         </div>
       </div>
