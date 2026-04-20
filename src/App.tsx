@@ -10,7 +10,7 @@ function App() {
   
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setIsLoading] = useState<boolean>(true);
+  const [loading, setIsLoading] = useState<boolean>(false);
 
   const askGemini = async (userMessage: string): Promise<string> => {
     const response = await ai.models.generateContent({
@@ -28,8 +28,6 @@ function App() {
   const handleSend = async (text?: string) => {
     
     const msg = text || message;
-
-    const reply = await askGemini(msg);
 
     if (!msg.trim() || loading) return;
 
