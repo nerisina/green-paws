@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import "./App.css";
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
-
+console.log('key:', import.meta.env.VITE_GEMINI_API_KEY?.slice(0, 8))
 type Message = {role: string, text: string};
 
 function App() {
@@ -26,7 +26,10 @@ function App() {
   };
 
   const handleSend = async (text?: string) => {
+    
     const msg = text || message;
+
+    const reply = await askGemini(msg);
 
     if (!msg.trim() || loading) return;
 
@@ -41,7 +44,6 @@ function App() {
         { role: "gemini", text: reply ?? "something went wrong 🐾" },
       ]);
     } catch (error) {
-      console.error("Gemini Error:", error);
       setMessages((prev) => [
         ...prev,
         {
