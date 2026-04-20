@@ -4,11 +4,15 @@ import "./App.css";
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
 
+type Message = {role: string, text: string};
+
 function App() {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [loading, setIsLoading] = useState('false');
-  const askGemini = async (userMessage) => {
+  
+  const [message, setMessage] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setIsLoading] = useState<boolean>(false);
+
+  const askGemini = async (userMessage: string): Promise<string> => {
     const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
       contents: userMessage,
@@ -18,10 +22,10 @@ function App() {
         Keep answers short, friendly, and fun. No markdown formatting, plain text only. Use dog and earth emojis occasionally 🐶🌍`,
       },
     });
-    return response.text;
+    return response.text ?? "";
   };
 
-  const handleSend = async (text) => {
+  const handleSend = async (text?: string) => {
     const msg = text || message;
 
     if (!msg.trim() || loading) return;
@@ -32,7 +36,10 @@ function App() {
 
     try {
       const reply = await askGemini(msg);
-      setMessages((prev) => [...prev, { role: "gemini", text: reply }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: "gemini", text: reply ?? "something went wrong 🐾" },
+      ]);
     } catch (error) {
       console.error("Gemini Error:", error);
       setMessages((prev) => [
@@ -97,7 +104,7 @@ function App() {
             <p className="example-label">try asking:</p>
             <div className="chips">
               {[
-                "are plastic poop bags bad for the environment?",
+                "are plastic dog poop bags bad for the environment?",
                 "what are compostable bag alternatives?",
                 "how do dog waste composters work?",
                 "is dog poop good for grass?",
